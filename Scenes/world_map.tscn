@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://be41oj8kk4ne6"]
+
+[ext_resource type="Script" path="res://Scripts/MapRenderer/MapRenderer.cs" id="1_hjwe6"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_q06ri"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="Environment" id="Environment_ii3go"]
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_kwpll"]
+
+[node name="WorldMap" type="Node3D"]
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+texture = SubResource("ViewportTexture_q06ri")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(2084, 800)
+
+[node name="Node2D" type="Node2D" parent="SubViewport"]
+script = ExtResource("1_hjwe6")
+
+[node name="Camera2D" type="Camera2D" parent="SubViewport"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ii3go")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="WorldEnvironment"]
+shape = SubResource("SeparationRayShape3D_kwpll")
+spring_length = 4.0
+
+[node name="Camera3D" type="Camera3D" parent="WorldEnvironment/SpringArm3D"]

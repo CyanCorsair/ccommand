@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://dtd836sr8eovl"]
+
+[node name="UnitBuilderRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="UnitEditor" type="TabContainer" parent="."]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+current_tab = 0
+
+[node name="Loadout" type="Panel" parent="UnitEditor"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Internals" type="Panel" parent="UnitEditor"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Armor" type="Panel" parent="UnitEditor"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="UnitParts" type="VSplitContainer" parent="."]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+[node name="UnitInfoContainer" type="Panel" parent="UnitParts"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="UnitPartContainer" type="Panel" parent="UnitParts"]
+layout_mode = 2
+
+[node name="Equipment" type="TabContainer" parent="UnitParts/UnitPartContainer"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Armaments" type="Panel" parent="UnitParts/UnitPartContainer/Equipment"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Ammunition" type="Panel" parent="UnitParts/UnitPartContainer/Equipment"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Support" type="Panel" parent="UnitParts/UnitPartContainer/Equipment"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Internals" type="TabContainer" parent="UnitParts/UnitPartContainer"]
+visible = false
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Power" type="Panel" parent="UnitParts/UnitPartContainer/Internals"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Engine" type="Panel" parent="UnitParts/UnitPartContainer/Internals"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Sensors" type="Panel" parent="UnitParts/UnitPartContainer/Internals"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="ArmorConfigContainer" type="Panel" parent="UnitParts/UnitPartContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CurrentListLabel" type="Label" parent="UnitParts/UnitPartContainer"]
+layout_mode = 1
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 168.0
+offset_bottom = 27.0
+text = "Available equipment
+"
+vertical_alignment = 1
