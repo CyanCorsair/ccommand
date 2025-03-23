@@ -4,49 +4,50 @@ using System.Threading.Tasks;
 using Godot;
 using Microsoft.Data.Sqlite;
 
-namespace CCDatabase;
-
-public class DatabaseProvider
+namespace CCDatabase
 {
-    private const string dbPath = "Data Source=Data/CCDatabase.db";
-    private SqliteConnection dbConnection;
-
-    public async Task ExecuteCommand(string commandString)
+    public class DatabaseProvider
     {
-        dbConnection = new SqliteConnection(dbPath);
+        private const string dbPath = "Data Source=Data/CCDatabase.db";
+        private SqliteConnection dbConnection;
 
-        try
+        public async Task ExecuteCommand(string commandString)
         {
-            await dbConnection.OpenAsync();
-            SqliteCommand command = GetCommand(commandString);
-            await command.ExecuteNonQueryAsync();
-        }
-        catch (SqliteException e)
-        {
-            GD.PrintErr($"Error: {e.Message}");
-            await dbConnection.DisposeAsync();
-            dbConnection = null;
-            throw e;
-        }
-        finally
-        {
-            await dbConnection.CloseAsync();
-            await dbConnection.DisposeAsync();
+            dbConnection = new SqliteConnection(dbPath);
 
-            dbConnection = null;
-        }
-    }
+            try
+            {
+                await dbConnection.OpenAsync();
+                SqliteCommand command = GetCommand(commandString);
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (SqliteException e)
+            {
+                GD.PrintErr($"Error: {e.Message}");
+                await dbConnection.DisposeAsync();
+                dbConnection = null;
+                throw e;
+            }
+            finally
+            {
+                await dbConnection.CloseAsync();
+                await dbConnection.DisposeAsync();
 
-    private SqliteCommand GetCommand(string text)
-    {
-        if (dbConnection is null || dbConnection.State != ConnectionState.Open)
-        {
-            return null;
+                dbConnection = null;
+            }
         }
 
-        SqliteCommand command = dbConnection.CreateCommand();
-        command.CommandText = text;
+        private SqliteCommand GetCommand(string text)
+        {
+            if (dbConnection is null || dbConnection.State != ConnectionState.Open)
+            {
+                return null;
+            }
 
-        return command;
+            SqliteCommand command = dbConnection.CreateCommand();
+            command.CommandText = text;
+
+            return command;
+        }
     }
 }
