@@ -80,14 +80,6 @@ public partial class Tile : Node2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        cells = new HexCell[width * height];
-        for (int z = 0, i = 0; z < height; z++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                HexCell.CreateCell(x, z, i++);
-            }
-        }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
