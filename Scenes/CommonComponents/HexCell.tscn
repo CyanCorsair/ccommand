@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dqfds7dred1q6"]
 
-[ext_resource type="Script" path="res://Scripts/Entities/HexMap/HexCell.cs" id="1_tq66l"]
+[ext_resource type="Script" uid="uid://d30arcir26n0a" path="res://Scripts/Entities/HexMap/HexCell.cs" id="1_tq66l"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8h64"]
 albedo_color = Color(0.930606, 0.440269, 0.263231, 1)

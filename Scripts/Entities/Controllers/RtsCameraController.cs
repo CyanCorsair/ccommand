@@ -133,6 +133,20 @@ public partial class RtsCameraController : Node3D
             isPanning = false;
             lastDragPoint = Position;
         }
+
+        if (@event.IsActionPressed("main_click"))
+        {
+            Vector3 clickLocation = GetGroundClickLocation();
+            HexCoordinates coords = HexCoordinates.FromPosition(clickLocation);
+            GD.Print("Click coordinates: " + coords.ToString());
+            GD.Print("Click location: " + clickLocation);
+        }
+
+        if (@event.IsActionPressed("secondary_click"))
+        {
+            Vector3 clickLocation = GetGroundClickLocation();
+            GD.Print("Click location 2: " + clickLocation);
+        }
     }
 
     public override void _Notification(int notification)

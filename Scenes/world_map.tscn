@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://be41oj8kk4ne6"]
 
 [ext_resource type="PackedScene" uid="uid://cbli4bqdmsc5t" path="res://Scenes/CommonComponents/RTSCameraController.tscn" id="1_jaetk"]
-[ext_resource type="Script" path="res://Scripts/Entities/HexMap/HexGrid.cs" id="2_krjpa"]
+[ext_resource type="Script" uid="uid://bitosr80fak04" path="res://Scripts/Entities/HexMap/HexGrid.cs" id="2_krjpa"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rpoqh"]
 
@@ -13,7 +13,6 @@ background_mode = 2
 sky = SubResource("Sky_h68r4")
 
 [node name="WorldMap" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.247589, 3.3307, 0.462708)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ii3go")

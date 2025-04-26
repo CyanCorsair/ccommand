@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cbli4bqdmsc5t"]
 
-[ext_resource type="Script" path="res://Scripts/Entities/Controllers/RtsCameraController.cs" id="1_nyesc"]
+[ext_resource type="Script" uid="uid://c74lim3x1u4u0" path="res://Scripts/Entities/Controllers/RtsCameraController.cs" id="1_nyesc"]
 
 [node name="RtsCameraController" type="Node3D"]
 script = ExtResource("1_nyesc")

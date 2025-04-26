@@ -4,6 +4,7 @@ using Godot;
 public partial class HexCell : Node3D
 {
     private MeshInstance3D meshInstanceNode;
+    private CollisionShape3D collisionShapeNode;
     private Label3D hexLabelNode;
 
     public PackedScene hexCellScene = ResourceLoader.Load<PackedScene>(
@@ -48,7 +49,10 @@ public partial class HexCell : Node3D
         }
 
         meshInstanceNode.Mesh = hexagon;
-        meshInstanceNode.CreateConvexCollision();
+        meshInstanceNode.CreateTrimeshCollision();
+        collisionShapeNode = meshInstanceNode.GetNode<CollisionShape3D>(
+            "HexMeshInstance_col/CollisionShape3D"
+        );
         meshInstanceNode.Transform.Translated(Vector3.Zero);
     }
 

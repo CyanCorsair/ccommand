@@ -26,7 +26,7 @@ namespace CCDatabase
                 GD.PrintErr($"Error: {e.Message}");
                 await dbConnection.DisposeAsync();
                 dbConnection = null;
-                throw e;
+                throw;
             }
             finally
             {
