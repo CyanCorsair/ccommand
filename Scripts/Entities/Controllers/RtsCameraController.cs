@@ -138,8 +138,8 @@ public partial class RtsCameraController : Node3D
         {
             Vector3 clickLocation = GetGroundClickLocation();
             HexCoordinates coords = HexCoordinates.FromPosition(clickLocation);
-            GD.Print("Click coordinates: " + coords.ToString());
-            GD.Print("Click location: " + clickLocation);
+            HexGrid gameGrid = GetNode<HexGrid>("/root/WorldMap/HexGrid");
+            gameGrid.TouchCell(coords);
         }
 
         if (@event.IsActionPressed("secondary_click"))

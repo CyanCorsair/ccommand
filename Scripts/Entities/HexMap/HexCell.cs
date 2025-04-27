@@ -7,6 +7,9 @@ public partial class HexCell : Node3D
     private CollisionShape3D collisionShapeNode;
     private Label3D hexLabelNode;
 
+    // Colors
+    public Color defaultColour = new Color(0.0f, 0.0f, 0.0f);
+
     public PackedScene hexCellScene = ResourceLoader.Load<PackedScene>(
         "res://Scenes/CommonComponents/HexCell.tscn"
     );
@@ -17,6 +20,10 @@ public partial class HexCell : Node3D
     ArrayMesh hexagon;
     List<Vector3> vertices = new List<Vector3>();
     List<int> triangles = new List<int>();
+    List<Color> colours = new List<Color>();
+
+    [Export]
+    HexCell[] neighbours = new HexCell[6];
 
     public HexCell CreateSceneInstance(string name, Transform3D transform)
     {
@@ -34,7 +41,7 @@ public partial class HexCell : Node3D
 
     public void SetCellText()
     {
-        hexLabelNode.Text = coordinates.ToLineSeparatedString();
+        hexLabelNode.Text = $"X: {coordinates.X}, Y: {coordinates.Y}, Z: {coordinates.Z}";
         var tempTransform = sceneInstance.Transform;
         tempTransform.Origin.Y = 0.001f;
         hexLabelNode.Transform = tempTransform;
@@ -43,12 +50,16 @@ public partial class HexCell : Node3D
 
     public void SetCellMesh()
     {
-        if (hexagon == null)
+        Triangulate();
+        meshInstanceNode.Mesh = hexagon;
+
+        for (int i = 0; i < hexagon.GetSurfaceCount(); i++)
         {
-            Triangulate();
+            StandardMaterial3D defaultMaterial = new StandardMaterial3D();
+            defaultMaterial.VertexColorUseAsAlbedo = true;
+            meshInstanceNode.SetSurfaceOverrideMaterial(i, defaultMaterial);
         }
 
-        meshInstanceNode.Mesh = hexagon;
         meshInstanceNode.CreateTrimeshCollision();
         collisionShapeNode = meshInstanceNode.GetNode<CollisionShape3D>(
             "HexMeshInstance_col/CollisionShape3D"
@@ -59,20 +70,32 @@ public partial class HexCell : Node3D
     public void Triangulate()
     {
         ClearMeshData();
+        hexagon ??= new ArrayMesh();
 
         Vector3 center = Transform.Origin;
         for (int i = 0; i < 6; i++)
         {
             AddTriangle(center, center + HexMetrics.corners[i], center + HexMetrics.corners[i + 1]);
+            AddTriangleColor(defaultColour);
+
+            Godot.Collections.Array arrays = new Godot.Collections.Array();
+            arrays.Resize((int)ArrayMesh.ArrayType.Max);
+            arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices.ToArray();
+            arrays[(int)ArrayMesh.ArrayType.Color] = colours.ToArray();
+
+            hexagon.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
         }
+    }
 
-        hexagon ??= new ArrayMesh();
+    public HexCell GetNeighbour(HexDirection direction)
+    {
+        return neighbours[(int)direction];
+    }
 
-        Godot.Collections.Array arrays = new Godot.Collections.Array();
-        arrays.Resize((int)ArrayMesh.ArrayType.Max);
-        arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices.ToArray();
-
-        hexagon.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
+    public void SetNeighbour(HexDirection direction, HexCell cell)
+    {
+        neighbours[(int)direction] = cell;
+        cell.neighbours[(int)direction.Opposite()] = this;
     }
 
     private void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
@@ -86,6 +109,13 @@ public partial class HexCell : Node3D
         triangles.Add(vertexIndex + 2);
     }
 
+    private void AddTriangleColor(Color colour)
+    {
+        colours.Add(colour);
+        colours.Add(colour);
+        colours.Add(colour);
+    }
+
     private void ClearMeshData()
     {
         if (hexagon != null)
@@ -93,6 +123,7 @@ public partial class HexCell : Node3D
             hexagon.ClearSurfaces();
             vertices.Clear();
             triangles.Clear();
+            colours.Clear();
         }
     }
 }

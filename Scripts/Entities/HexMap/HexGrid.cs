@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 [GlobalClass]
 public partial class HexGrid : Node3D
@@ -12,6 +13,15 @@ public partial class HexGrid : Node3D
     private PackedScene hexGridScene = ResourceLoader.Load<PackedScene>(
         "res://Scenes/CommonComponents/HexGrid.tscn"
     );
+
+    // Colors
+    [ExportGroup("Hex Colors")]
+    [Export]
+    public Color defaultCellColour = new Color(0.0f, 0.0f, 0.0f);
+
+    [Export]
+    public Color touchedCellColour = new Color(0.6f, 1.0f, 0.7f);
+
     public HexGrid hexGridInstance;
 
     public HexGrid InstanceHexGrid()
@@ -37,6 +47,22 @@ public partial class HexGrid : Node3D
         }
     }
 
+    public void TouchCell(HexCoordinates position)
+    {
+        HexCell cell = cells.FirstOrDefault(
+            cell =>
+                cell.coordinates.X == -position.X
+                && cell.coordinates.Z == -position.Z
+                && cell.coordinates.Y == -position.Y
+        );
+
+        if (cell != null)
+        {
+            cell.defaultColour = touchedCellColour;
+            cell.SetCellMesh();
+        }
+    }
+
     private void CreateCell(int x, int z, int i)
     {
         Vector3 position;
@@ -46,6 +72,31 @@ public partial class HexGrid : Node3D
 
         HexCell cell = cells[i] = new HexCell();
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
+        cell.defaultColour = defaultCellColour;
+
+        if (x > 0)
+        {
+            cell.SetNeighbour(HexDirection.West, cells[i - 1]);
+        }
+        if (z > 0)
+        {
+            if ((z & 1) == 0)
+            {
+                cell.SetNeighbour(HexDirection.SouthEast, cells[i - width]);
+                if (x > 0)
+                {
+                    cell.SetNeighbour(HexDirection.SouthWest, cells[i - width - 1]);
+                }
+            }
+            else
+            {
+                cell.SetNeighbour(HexDirection.SouthWest, cells[i - width]);
+                if (x < width - 1)
+                {
+                    cell.SetNeighbour(HexDirection.SouthEast, cells[i - width + 1]);
+                }
+            }
+        }
 
         cell.Name = "Hex Cell " + x + ", " + z;
         cell.Transform = new Transform3D(Basis.Identity, position / -2f);
