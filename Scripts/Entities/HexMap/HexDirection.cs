@@ -1,3 +1,5 @@
+using System.Numerics;
+
 public enum HexDirection
 {
     NorthEast,
@@ -15,5 +17,15 @@ public static class HexDirectionExtensions
         return (int)direction < 3
             ? (HexDirection)((int)direction + 3)
             : (HexDirection)((int)direction - 3);
+    }
+
+    public static HexDirection Previous(this HexDirection direction)
+    {
+        return direction == HexDirection.NorthEast ? HexDirection.NorthWest : (direction - 1);
+    }
+
+    public static HexDirection Next(this HexDirection direction)
+    {
+        return direction == HexDirection.NorthWest ? HexDirection.NorthEast : (direction + 1);
     }
 }

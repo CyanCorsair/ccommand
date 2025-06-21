@@ -3,6 +3,8 @@
 * Some aspects had to be adjusted, so it's not 1:1
 */
 
+using System.Linq;
+using CCommandCore.DevTools;
 using Godot;
 
 public partial class RtsCameraController : Node3D
@@ -81,11 +83,14 @@ public partial class RtsCameraController : Node3D
 
     bool isMouseInWindow = true;
 
+    DevToolsUi devToolsReference;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         elevationInstance = GetNode<Node3D>("Elevation");
         cameraInstance = GetNode<Camera3D>("Elevation/MainCamera");
+        devToolsReference = GetNode<DevToolsUi>("/root/DevToolsUi");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -139,7 +144,20 @@ public partial class RtsCameraController : Node3D
             Vector3 clickLocation = GetGroundClickLocation();
             HexCoordinates coords = HexCoordinates.FromPosition(clickLocation);
             HexGrid gameGrid = GetNode<HexGrid>("/root/WorldMap/HexGrid");
-            gameGrid.TouchCell(coords);
+            HexCell targetCell = gameGrid.GetHexCell(coords);
+
+            if (targetCell != null)
+            {
+                targetCell.defaultColourOne = devToolsReference.getActiveTerrainColor();
+                gameGrid.TouchCell(coords);
+
+                HexCell[] neighbours = targetCell.GetAllNeighbours();
+
+                for (int i = 0, len = neighbours.Count(); i < len; i++)
+                {
+                    GD.Print(neighbours[i]?.Name);
+                }
+            }
         }
 
         if (@event.IsActionPressed("secondary_click"))

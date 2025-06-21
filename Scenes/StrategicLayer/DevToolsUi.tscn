@@ -1,0 +1,79 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsbwb6nmqjnnk"]
+
+[ext_resource type="Script" uid="uid://bl0ifxk6yb3rk" path="res://Scripts/UI/Dev/TerrainEditor.cs" id="1_3qe0i"]
+[ext_resource type="Script" uid="uid://ctdxw3ug4rbno" path="res://Scripts/UI/Dev/Elements/TerrainCheckbox.cs" id="2_2geuk"]
+
+[sub_resource type="Theme" id="Theme_ywrig"]
+
+[node name="DevToolsUi" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TerrainWrapper" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 41.0
+offset_right = 261.0
+offset_bottom = 222.0
+theme = SubResource("Theme_ywrig")
+
+[node name="Terrainlist" type="ItemList" parent="TerrainWrapper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3qe0i")
+
+[node name="PlainsContainer" type="HBoxContainer" parent="TerrainWrapper/Terrainlist"]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 10.0
+offset_right = 156.0
+offset_bottom = 50.0
+
+[node name="PlainsCheckbox" type="CheckButton" parent="TerrainWrapper/Terrainlist/PlainsContainer"]
+layout_mode = 2
+button_pressed = true
+script = ExtResource("2_2geuk")
+terrain = 1
+
+[node name="PlainsLabel" type="Label" parent="TerrainWrapper/Terrainlist/PlainsContainer"]
+layout_mode = 2
+text = "Plains"
+
+[node name="HillsContainer" type="HBoxContainer" parent="TerrainWrapper/Terrainlist"]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 54.0
+offset_right = 156.0
+offset_bottom = 94.0
+
+[node name="HillsCheckbox" type="CheckButton" parent="TerrainWrapper/Terrainlist/HillsContainer"]
+layout_mode = 2
+script = ExtResource("2_2geuk")
+terrain = 2
+
+[node name="HillsLabel" type="Label" parent="TerrainWrapper/Terrainlist/HillsContainer"]
+layout_mode = 2
+text = "Hills"
+
+[node name="ShallowWaterContainer" type="HBoxContainer" parent="TerrainWrapper/Terrainlist"]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 99.0
+offset_right = 166.0
+offset_bottom = 139.0
+
+[node name="ShallowWaterCheckbox" type="CheckButton" parent="TerrainWrapper/Terrainlist/ShallowWaterContainer"]
+layout_mode = 2
+script = ExtResource("2_2geuk")
+
+[node name="ShallowWaterLabel" type="Label" parent="TerrainWrapper/Terrainlist/ShallowWaterContainer"]
+layout_mode = 2
+text = "Shallow water"

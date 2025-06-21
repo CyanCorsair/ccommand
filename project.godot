@@ -12,8 +12,12 @@ config_version=5
 
 config/name="C-Command"
 run/main_scene="res://Scenes/world_map.tscn"
-config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+DevToolsUi="*res://Scripts/UI/Dev/DevToolsUi.cs"
 
 [dotnet]
 

@@ -22,6 +22,11 @@ public partial class HexGrid : Node3D
     [Export]
     public Color touchedCellColour = new Color(0.6f, 1.0f, 0.7f);
 
+    Color ShallowWater = new Color(0.416f, 0.827f, 1.0f);
+    Color Plains = new Color(0.659f, 0.871f, 0.341f);
+    Color Hills = new Color(0.749f, 0.62f, 0.141f);
+    Color Mountains = new Color(0.412f, 0.247f, 0.063f);
+
     public HexGrid hexGridInstance;
 
     public HexGrid InstanceHexGrid()
@@ -49,18 +54,23 @@ public partial class HexGrid : Node3D
 
     public void TouchCell(HexCoordinates position)
     {
-        HexCell cell = cells.FirstOrDefault(
+        HexCell cell = GetHexCell(position);
+
+        if (cell != null)
+        {
+            cell.defaultColourOne = touchedCellColour;
+            cell.SetCellMesh();
+        }
+    }
+
+    public HexCell GetHexCell(HexCoordinates position)
+    {
+        return cells.FirstOrDefault(
             cell =>
                 cell.coordinates.X == -position.X
                 && cell.coordinates.Z == -position.Z
                 && cell.coordinates.Y == -position.Y
         );
-
-        if (cell != null)
-        {
-            cell.defaultColour = touchedCellColour;
-            cell.SetCellMesh();
-        }
     }
 
     private void CreateCell(int x, int z, int i)
@@ -72,7 +82,9 @@ public partial class HexGrid : Node3D
 
         HexCell cell = cells[i] = new HexCell();
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.defaultColour = defaultCellColour;
+        cell.defaultColourOne = i % 2 == 0 ? Plains : Hills;
+        cell.defaultColourTwo = Plains;
+        cell.defaultColourThree = ShallowWater;
 
         if (x > 0)
         {

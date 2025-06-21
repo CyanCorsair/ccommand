@@ -10,10 +10,10 @@ namespace Terrain
 
         public ColorCodes()
         {
-            TerrainColors.Add(TerrainTypes.ShallowWater, new Color(0, 0, 255));
-            TerrainColors.Add(TerrainTypes.Plains, new Color(0, 255, 0));
-            TerrainColors.Add(TerrainTypes.Hills, new Color(255, 255, 0));
-            TerrainColors.Add(TerrainTypes.Mountains, new Color(255, 0, 0));
+            TerrainColors.Add(TerrainTypes.ShallowWater, new Color(0.416f, 0.827f, 1.0f));
+            TerrainColors.Add(TerrainTypes.Plains, new Color(0.659f, 0.871f, 0.341f));
+            TerrainColors.Add(TerrainTypes.Hills, new Color(0.749f, 0.62f, 0.141f));
+            TerrainColors.Add(TerrainTypes.Mountains, new Color(0.412f, 0.247f, 0.063f));
         }
     }
 
