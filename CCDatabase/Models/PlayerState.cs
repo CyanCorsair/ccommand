@@ -1,7 +1,12 @@
-namespace Database.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public class PlayerState
+namespace CCommand.CCDatabase.Models
 {
-    public int PlayerStateId { get; set; }
-    public int PlayerId { get; set; }
+    internal class PlayerState
+    {
+    }
 }

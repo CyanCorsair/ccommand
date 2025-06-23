@@ -22,6 +22,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\CCDatabase\CCDatabase.csproj" />
   </ItemGroup>
 </Project>

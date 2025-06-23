@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CCommand.CCDatabase.Models
+namespace CCommand.CCDatabase.Contexts.StrategicLayer
 {
-    internal class World
+    internal class PlayerContext
     {
     }
 }

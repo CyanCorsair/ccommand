@@ -1,11 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Database.Models;
-
-public class WorldState
+namespace CCommand.CCDatabase.Models
 {
-    public int WorldStateId { get; set; }
-    public int WorldId { get; set; }
+    internal class WorldState
+    {
+    }
 }

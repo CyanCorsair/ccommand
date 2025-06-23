@@ -1,11 +1,12 @@
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Database.Models;
-
-public class GameState
+namespace CCommand.CCDatabase.Models
 {
-    public int GameId { get; set; }
-    public int ActiveWorldId { get; set; }
-    public int PlayerCount { get; set; }
-    public List<int> PlayerIds { get; set; }
+    internal class GameState
+    {
+    }
 }
