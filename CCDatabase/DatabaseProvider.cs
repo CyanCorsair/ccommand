@@ -78,5 +78,6 @@ namespace CCommand.CCDatabase
             {
                 throw new InvalidOperationException($"Database file was not created at {fullDatabaseFilePath}.");
             }
+        }
     }
 }
