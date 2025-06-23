@@ -3,9 +3,6 @@
 Assets/
 addons/
 .vscode/
-CCDatabase/bin
-CCDatabase/obj
-CCommandTests/bin
-CCommandTests/obj
-DatabaseTests/bin
-DatabaseTests/obj
+.vs/
+*/bin
+*/obj
