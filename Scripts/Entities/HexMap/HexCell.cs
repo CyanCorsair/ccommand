@@ -9,8 +9,6 @@ public partial class HexCell : Node3D
     private Label3D hexLabelNode;
 
     private SurfaceTool surfaceTool = new SurfaceTool();
-    private SurfaceTool surfaceTool2 = new SurfaceTool();
-    private bool hasCenterBeenAdded = false;
 
     // Colors
     public Color defaultColourOne = new Color(1.0f, 1.0f, 0.0f);
@@ -24,11 +22,21 @@ public partial class HexCell : Node3D
 
     public HexCoordinates coordinates;
 
+    private int elevation;
+
     ArrayMesh hexMesh;
-    ArrayMesh hexagon;
 
     [Export]
     HexCell[] neighbours = new HexCell[6];
+
+    public int Elevation
+    {
+        get => elevation;
+        set
+        {
+            elevation = value;
+        }
+    }
 
     public HexCell CreateSceneInstance(string name, Transform3D transform)
     {
@@ -48,27 +56,19 @@ public partial class HexCell : Node3D
     {
         hexLabelNode.Text = $"X: {coordinates.X}, Z: {coordinates.Z}";
         var tempTransform = sceneInstance.Transform;
-        tempTransform.Origin.Y = 0.001f;
+        tempTransform.Origin.Y = 0.001f + elevation;
         hexLabelNode.Transform = tempTransform;
         hexLabelNode.Rotate(new Vector3(1f, 0f, 0f), Mathf.DegToRad(-90f));
     }
 
     public void SetCellMesh()
     {
-        surfaceTool.Clear();
-        surfaceTool2.Clear();
-
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
-        surfaceTool2.Begin(Mesh.PrimitiveType.Triangles);
         Triangulate();
         surfaceTool.Index();
         surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
-        surfaceTool2.Index();
-        surfaceTool2.GenerateNormals();
-        surfaceTool2.GenerateTangents();
-        hexagon = surfaceTool2.Commit();
-        hexMesh = surfaceTool.Commit(hexagon);
+        hexMesh = surfaceTool.Commit();
         meshInstanceNode.Mesh = hexMesh;
 
         for (int i = 0; i < hexMesh.GetSurfaceCount(); i++)
@@ -76,6 +76,14 @@ public partial class HexCell : Node3D
             StandardMaterial3D defaultMaterial = new StandardMaterial3D();
             defaultMaterial.VertexColorUseAsAlbedo = true;
             meshInstanceNode.SetSurfaceOverrideMaterial(i, defaultMaterial);
+        }
+
+        if (meshInstanceNode.HasNode("HexMeshInstance_col"))
+        {
+            StaticBody3D hexMeshColContainer = meshInstanceNode.GetNode<StaticBody3D>(
+                "HexMeshInstance_col"
+            );
+            hexMeshColContainer.Free();
         }
 
         meshInstanceNode.CreateTrimeshCollision();
@@ -99,6 +107,8 @@ public partial class HexCell : Node3D
         Vector3 v1 = center + HexMetrics.GetFirstSolidCorner(direction);
         Vector3 v2 = center + HexMetrics.GetSecondSolidCorner(direction);
 
+        center.Y = v1.Y = v2.Y = cell.Elevation * HexMetrics.elevationStep;
+
         SetTriangleVerticesMono(center, v1, v2,
             cell.defaultColourOne);
         
@@ -111,7 +121,7 @@ public partial class HexCell : Node3D
     public void Triangulate()
     {
         ClearMeshData();
-        hexagon ??= new ArrayMesh();
+        hexMesh ??= new ArrayMesh();
         for (int i = 0; i < 6; i++)
         {
             Triangulate(this);
@@ -191,6 +201,7 @@ public partial class HexCell : Node3D
         Vector3 bridge = HexMetrics.GetBridge(direction);
         Vector3 v3 = v1 + bridge;
         Vector3 v4 = v2 + bridge;
+        v3.Y = v4.Y = neighbour.Elevation * HexMetrics.elevationStep;
 
         AddQuad(
             v1, v2, v3, v4,
@@ -198,8 +209,10 @@ public partial class HexCell : Node3D
 
         if (direction <= HexDirection.East && nextNeighbour != null)
         {
+            Vector3 v5 = v2 + HexMetrics.GetBridge(direction.Next());
+            v5.Y = nextNeighbour.Elevation * HexMetrics.elevationStep;
             SetTriangleVertices(
-                v2, v4, v2 + HexMetrics.GetBridge(direction.Next()),
+                v2, v4, v5,
                 cell.defaultColourOne, neighbour.defaultColourOne, nextNeighbour.defaultColourOne);
         }
     }
@@ -210,44 +223,43 @@ public partial class HexCell : Node3D
         Vector3 v3,
         Vector3 v4,
         Color c1,
-        Color c2
-    )
+        Color c2)
     {
-        surfaceTool2.SetSmoothGroup(UInt32.MaxValue);
+        surfaceTool.SetSmoothGroup(UInt32.MaxValue);
 
         // Triangle 1
-        surfaceTool2.SetColor(c1);
-        surfaceTool2.SetUV(new Vector2(v1.X, v1.Y));
-        surfaceTool2.AddVertex(v1);
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v1.X, v1.Y));
+        surfaceTool.AddVertex(v1);
 
-        surfaceTool2.SetColor(c1);
-        surfaceTool2.SetUV(new Vector2(v2.X, v2.Y));
-        surfaceTool2.AddVertex(v2);
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v2.X, v2.Y));
+        surfaceTool.AddVertex(v2);
 
-        surfaceTool2.SetColor(c2);
-        surfaceTool2.SetUV(new Vector2(v4.X, v4.Y));
-        surfaceTool2.AddVertex(v4);
+        surfaceTool.SetColor(c2);
+        surfaceTool.SetUV(new Vector2(v4.X, v4.Y));
+        surfaceTool.AddVertex(v4);
 
         // Triangle 2
-        surfaceTool2.SetColor(c1);
-        surfaceTool2.SetUV(new Vector2(v1.X, v1.Y));
-        surfaceTool2.AddVertex(v1);
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v1.X, v1.Y));
+        surfaceTool.AddVertex(v1);
 
-        surfaceTool2.SetColor(c2);
-        surfaceTool2.SetUV(new Vector2(v4.X, v4.Y));
-        surfaceTool2.AddVertex(v4);
+        surfaceTool.SetColor(c2);
+        surfaceTool.SetUV(new Vector2(v4.X, v4.Y));
+        surfaceTool.AddVertex(v4);
 
-        surfaceTool2.SetColor(c2);
-        surfaceTool2.SetUV(new Vector2(v3.X, v3.Y));
-        surfaceTool2.AddVertex(v3);
+        surfaceTool.SetColor(c2);
+        surfaceTool.SetUV(new Vector2(v3.X, v3.Y));
+        surfaceTool.AddVertex(v3);
     }
 
     void ClearMeshData()
     {
-        if (hexagon != null)
+        if (hexMesh != null)
         {
             hexMesh.ClearSurfaces();
-            hexagon.ClearSurfaces();
+            meshInstanceNode.Mesh = null;
         }
     }
 }

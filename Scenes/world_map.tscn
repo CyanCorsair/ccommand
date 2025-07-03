@@ -27,6 +27,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0222998, -0.0579891, -0.097
 script = ExtResource("2_krjpa")
 defaultCellColour = Color(0.141391, 0.600798, 0.723549, 1)
 touchedCellColour = Color(0.909678, 0.896388, 0.822531, 1)
+activeElevation = 1
 
 [node name="WorldSun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.766044, -0.604023, -0.219846, -2.99004e-08, -0.34202, 0.939693, -0.642788, -0.719846, -0.262003, 0, 0, 0)

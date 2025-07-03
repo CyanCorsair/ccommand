@@ -6,8 +6,8 @@ using System.Linq;
 [GlobalClass]
 public partial class HexGrid : Node3D
 {
-    public int width = 24;
-    public int height = 24;
+    public int width = 8;
+    public int height = 8;
 
     private HexCell[] cells;
     private PackedScene hexGridScene = ResourceLoader.Load<PackedScene>(
@@ -26,6 +26,11 @@ public partial class HexGrid : Node3D
     Color Plains = new Color(0.659f, 0.871f, 0.341f);
     Color Hills = new Color(0.749f, 0.62f, 0.141f);
     Color Mountains = new Color(0.412f, 0.247f, 0.063f);
+
+    // Height values
+    [ExportGroup("Hex Height")]
+    [Export]
+    public int activeElevation = 0;
 
     public HexGrid hexGridInstance;
 
@@ -67,7 +72,20 @@ public partial class HexGrid : Node3D
         if (cell != null)
         {
             cell.defaultColourOne = touchedCellColour;
+            cell.Elevation = activeElevation;
             cell.SetCellMesh();
+            cell.SetCellText();
+        }
+
+        HexCell[] neighbours = cell.GetAllNeighbours();
+
+        foreach (HexCell neighbour in neighbours)
+        {
+            if (neighbour != null)
+            {
+                neighbour.SetCellMesh();
+                neighbour.SetCellText();
+            }
         }
     }
 

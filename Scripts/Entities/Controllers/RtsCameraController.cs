@@ -149,6 +149,7 @@ public partial class RtsCameraController : Node3D
             if (targetCell != null)
             {
                 targetCell.defaultColourOne = devToolsReference.getActiveTerrainColor();
+                GD.Print("PRINT DEBUG");
                 gameGrid.TouchCell(coords);
 
                 HexCell[] neighbours = targetCell.GetAllNeighbours();
