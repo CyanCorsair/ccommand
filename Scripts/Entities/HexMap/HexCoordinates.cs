@@ -1,5 +1,7 @@
 using Godot;
 
+using CCommandCore.HexMap.HexMetrics;
+
 [System.Serializable]
 public struct HexCoordinates
 {

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using CCommandCore.HexMap.HexMetrics;
+
 [GlobalClass]
 public partial class HexGrid : Node3D
 {
@@ -31,6 +33,9 @@ public partial class HexGrid : Node3D
     [ExportGroup("Hex Height")]
     [Export]
     public int activeElevation = 0;
+
+    [Export]
+    NoiseTexture3D testNoiseTexture;
 
     public HexGrid hexGridInstance;
 
@@ -108,9 +113,31 @@ public partial class HexGrid : Node3D
 
         HexCell cell = cells[i] = new HexCell();
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.defaultColourOne = i % 2 == 0 ? Plains : Hills;
-        cell.defaultColourTwo = Plains;
-        cell.defaultColourThree = ShallowWater;
+
+        float noiseValue2D = testNoiseTexture.Noise.GetNoise2D(x, z) * 10f;
+        int adjustedHeightValue;
+
+        if (noiseValue2D <= 0.25 && noiseValue2D >= 0)
+        {
+            adjustedHeightValue = Mathf.FloorToInt(noiseValue2D);
+            cell.defaultColourOne = Plains;
+        }
+        else if (noiseValue2D < 0)
+        {
+            adjustedHeightValue = Mathf.FloorToInt(noiseValue2D) - 1;
+            cell.defaultColourOne = ShallowWater;
+        }
+        else if (noiseValue2D > 0.25 && noiseValue2D <= 0.5)
+        {
+            adjustedHeightValue = 1 + Mathf.CeilToInt(noiseValue2D);
+            cell.defaultColourOne = Hills;
+        }
+        else
+        {
+            adjustedHeightValue = 1 + Mathf.CeilToInt(noiseValue2D * 2f);
+            cell.defaultColourOne = Mountains;
+        }
+        cell.Elevation = adjustedHeightValue;
 
         if (x > 0)
         {

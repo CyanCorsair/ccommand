@@ -322,7 +322,7 @@ public partial class RtsCameraController : Node3D
             zoomDirection = (int)forcedZoomDirection;
         }
 
-        var cameraHeight = Position.Y != 0 ? Position.Y : 10f;
+        var cameraHeight = Position.Y != 0 ? Position.Y * 10 : 10f;
         double newZoom = Mathf.Clamp((cameraHeight + zoomSpeed) * zoomDirection, minZoom, maxZoom);
 
         if (zoomDirection < 0)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://be41oj8kk4ne6"]
+[gd_scene load_steps=9 format=3 uid="uid://be41oj8kk4ne6"]
 
 [ext_resource type="PackedScene" uid="uid://cbli4bqdmsc5t" path="res://Scenes/CommonComponents/RTSCameraController.tscn" id="1_jaetk"]
 [ext_resource type="Script" uid="uid://bitosr80fak04" path="res://Scripts/Entities/HexMap/HexGrid.cs" id="2_krjpa"]
@@ -11,6 +11,19 @@ sky_material = SubResource("ProceduralSkyMaterial_rpoqh")
 [sub_resource type="Environment" id="Environment_ii3go"]
 background_mode = 2
 sky = SubResource("Sky_h68r4")
+
+[sub_resource type="Gradient" id="Gradient_b7gke"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b7gke"]
+noise_type = 3
+frequency = 0.02
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_llh6y"]
+width = 512
+height = 512
+seamless = true
+color_ramp = SubResource("Gradient_b7gke")
+noise = SubResource("FastNoiseLite_b7gke")
 
 [node name="WorldMap" type="Node3D"]
 
@@ -27,7 +40,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0222998, -0.0579891, -0.097
 script = ExtResource("2_krjpa")
 defaultCellColour = Color(0.141391, 0.600798, 0.723549, 1)
 touchedCellColour = Color(0.909678, 0.896388, 0.822531, 1)
-activeElevation = 1
+activeElevation = 2
+testNoiseTexture = SubResource("NoiseTexture3D_llh6y")
 
 [node name="WorldSun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.766044, -0.604023, -0.219846, -2.99004e-08, -0.34202, 0.939693, -0.642788, -0.719846, -0.262003, 0, 0, 0)
