@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCommand.CCDatabase.Models
 {
-    internal class WorldState
+    public class WorldState
     {
     }
 }

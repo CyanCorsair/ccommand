@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CCommand.CCDatabase.Models
+namespace CCommand.CCDatabase.Models.Game
 {
-    internal class GameState
+    public class GameSetting
     {
     }
 }

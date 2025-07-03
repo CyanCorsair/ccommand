@@ -50,6 +50,14 @@ public partial class HexGrid : Node3D
                 CreateCell(x, z, i++);
             }
         }
+
+        for (int z = 0, i = 0; z < height; z++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                SetCellWorldData(i++);
+            }
+        }
     }
 
     public void TouchCell(HexCoordinates position)
@@ -67,9 +75,9 @@ public partial class HexGrid : Node3D
     {
         return cells.FirstOrDefault(
             cell =>
-                cell.coordinates.X == -position.X
-                && cell.coordinates.Z == -position.Z
-                && cell.coordinates.Y == -position.Y
+                cell.coordinates.X == position.X
+                && cell.coordinates.Z == position.Z
+                && cell.coordinates.Y == position.Y
         );
     }
 
@@ -111,9 +119,14 @@ public partial class HexGrid : Node3D
         }
 
         cell.Name = "Hex Cell " + x + ", " + z;
-        cell.Transform = new Transform3D(Basis.Identity, position / -2f);
+        cell.Transform = new Transform3D(Basis.Identity, position / 2f);
         cell.CreateSceneInstance(cell.Name, cell.Transform);
         AddChild(cell.sceneInstance);
+    }
+
+    private void SetCellWorldData(int i)
+    {
+        HexCell cell = cells[i];
 
         cell.SetChildNodeReferences();
         cell.SetCellMesh();

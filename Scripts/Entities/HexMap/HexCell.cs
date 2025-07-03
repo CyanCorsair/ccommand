@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -25,14 +26,6 @@ public partial class HexCell : Node3D
 
     ArrayMesh hexMesh;
     ArrayMesh hexagon;
-    List<Vector3> hexVertices = new List<Vector3>();
-    List<Vector3> quadVertices = new List<Vector3>();
-    List<Vector2> hexUvs = new List<Vector2>();
-    List<Vector2> quadUvs = new List<Vector2>();
-    List<int> triangles = new List<int>();
-    List<int> quads = new List<int>();
-    List<Color> hexColours = new List<Color>();
-    List<Color> quadColours = new List<Color>();
 
     [Export]
     HexCell[] neighbours = new HexCell[6];
@@ -53,7 +46,7 @@ public partial class HexCell : Node3D
 
     public void SetCellText()
     {
-        hexLabelNode.Text = $"X: {coordinates.X}, Y: {coordinates.Y}, Z: {coordinates.Z}";
+        hexLabelNode.Text = $"X: {coordinates.X}, Z: {coordinates.Z}";
         var tempTransform = sceneInstance.Transform;
         tempTransform.Origin.Y = 0.001f;
         hexLabelNode.Transform = tempTransform;
@@ -62,12 +55,18 @@ public partial class HexCell : Node3D
 
     public void SetCellMesh()
     {
+        surfaceTool.Clear();
+        surfaceTool2.Clear();
+
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
-        surfaceTool2.Begin(Mesh.PrimitiveType.TriangleStrip);
+        surfaceTool2.Begin(Mesh.PrimitiveType.Triangles);
         Triangulate();
         surfaceTool.Index();
         surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
+        surfaceTool2.Index();
+        surfaceTool2.GenerateNormals();
+        surfaceTool2.GenerateTangents();
         hexagon = surfaceTool2.Commit();
         hexMesh = surfaceTool.Commit(hexagon);
         meshInstanceNode.Mesh = hexMesh;
@@ -96,57 +95,17 @@ public partial class HexCell : Node3D
 
     void Triangulate(HexDirection direction, HexCell cell)
     {
-        Godot.Collections.Array arrays = new Godot.Collections.Array();
-        arrays.Resize((int)ArrayMesh.ArrayType.Max);
-
         Vector3 center = Transform.Origin;
         Vector3 v1 = center + HexMetrics.GetFirstSolidCorner(direction);
         Vector3 v2 = center + HexMetrics.GetSecondSolidCorner(direction);
 
-        if (!hasCenterBeenAdded)
+        SetTriangleVerticesMono(center, v1, v2,
+            cell.defaultColourOne);
+        
+        if (direction <= HexDirection.SouthEast)
         {
-            AddTriangle(center, v1, v2);
-            AddTriangleColor(cell.defaultColourOne);
-            hasCenterBeenAdded = true;
+            TriangulateConnection(direction, cell, v1, v2);
         }
-        else
-        {
-            ContinueTriangle(v1, v2);
-            ContinueTriangleColor(cell.defaultColourOne);
-        }
-
-        Vector3 v3 = center + HexMetrics.GetFirstCorner(direction);
-        Vector3 v4 = center + HexMetrics.GetSecondCorner(direction);
-
-        HexCell nextNeighbour = cell.GetNeighbour(direction.Next()) ?? cell;
-        HexCell prevNeighbour = cell.GetNeighbour(direction.Previous()) ?? cell;
-        HexCell neighbour = cell.GetNeighbour(direction) ?? cell;
-
-        Color edgeColourPrev =
-            (cell.defaultColourOne + prevNeighbour.defaultColourOne + neighbour.defaultColourOne)
-            / 3f;
-        Color innerEdgeColourPrev =
-            (cell.defaultColourOne + prevNeighbour.defaultColourOne + neighbour.defaultColourOne)
-            / 2f;
-        Color edgeColourNext =
-            (cell.defaultColourOne + neighbour.defaultColourOne + nextNeighbour.defaultColourOne)
-            / 3f;
-        Color innerEdgeColourNext =
-            (cell.defaultColourOne + neighbour.defaultColourOne + nextNeighbour.defaultColourOne)
-            / 2f;
-
-        AddQuad(
-            v1,
-            v2,
-            v3,
-            v4,
-            edgeColourNext,
-            edgeColourPrev,
-            innerEdgeColourPrev,
-            innerEdgeColourNext
-        );
-
-        AddQuadColour(cell.defaultColourOne, cell.defaultColourOne, edgeColourPrev, edgeColourNext);
     }
 
     public void Triangulate()
@@ -156,22 +115,7 @@ public partial class HexCell : Node3D
         for (int i = 0; i < 6; i++)
         {
             Triangulate(this);
-
-            Godot.Collections.Array quadArrays = new Godot.Collections.Array();
-            quadArrays.Resize((int)ArrayMesh.ArrayType.Max);
-            quadArrays[(int)ArrayMesh.ArrayType.Vertex] = quadVertices.ToArray();
-            quadArrays[(int)ArrayMesh.ArrayType.Color] = quadColours.ToArray();
-
-            if (hexVertices.Count != hexColours.Count)
-            {
-                GD.PrintErr(
-                    $"Vertex count ({hexVertices.Count}) does not match color count ({hexColours.Count})!"
-                );
-            }
-            //hexagon.AddSurfaceFromArrays(Mesh.PrimitiveType.TriangleStrip, quadArrays);
         }
-
-        surfaceTool.AddTriangleFan(hexVertices.ToArray(), hexUvs.ToArray(), hexColours.ToArray());
     }
 
     public HexCell[] GetAllNeighbours()
@@ -190,44 +134,74 @@ public partial class HexCell : Node3D
         cell.neighbours[(int)direction.Opposite()] = this;
     }
 
-    void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
+    void SetTriangleVertices(
+        Vector3 v1, Vector3 v2, Vector3 v3,
+        Color c1, Color c2, Color c3)
     {
-        int vertexIndex = hexVertices.Count;
-        hexVertices.Add(v1);
-        hexUvs.Add(new Vector2(v1.X, v1.Y));
-        hexVertices.Add(v2);
-        hexUvs.Add(new Vector2(v2.X, v2.Y));
-        hexVertices.Add(v3);
-        hexUvs.Add(new Vector2(v3.X, v3.Y));
-        triangles.Add(vertexIndex);
-        triangles.Add(vertexIndex + 1);
-        triangles.Add(vertexIndex + 2);
+        surfaceTool.SetSmoothGroup(UInt32.MaxValue);
+
+        surfaceTool.SetColor(c3);
+        surfaceTool.SetUV(new Vector2(v3.X, v3.Y));
+        surfaceTool.AddVertex(v3);
+
+        surfaceTool.SetColor(c2);
+        surfaceTool.SetUV(new Vector2(v2.X, v2.Y));
+        surfaceTool.AddVertex(v2);
+
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v1.X, v1.Y));
+        surfaceTool.AddVertex(v1);
     }
 
-    void AddTriangleColor(Color colourOne)
+    void SetTriangleVerticesMono(
+        Vector3 v1, Vector3 v2, Vector3 v3,
+        Color c1)
     {
-        hexColours.Add(colourOne);
-        hexColours.Add(colourOne);
-        hexColours.Add(colourOne);
+        surfaceTool.SetSmoothGroup(UInt32.MaxValue);
+
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v3.X, v3.Y));
+        surfaceTool.AddVertex(v3);
+
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v2.X, v2.Y));
+        surfaceTool.AddVertex(v2);
+
+        surfaceTool.SetColor(c1);
+        surfaceTool.SetUV(new Vector2(v1.X, v1.Y));
+        surfaceTool.AddVertex(v1);
     }
 
-    void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4)
+    void TriangulateConnection(
+        HexDirection direction,
+        HexCell cell,
+        Vector3 v1,
+        Vector3 v2)
     {
-        int vertexIndex = quadVertices.Count;
-        quadVertices.Add(v1);
-        quadUvs.Add(new Vector2(v1.X, v1.Y));
-        quadVertices.Add(v2);
-        quadUvs.Add(new Vector2(v2.X, v2.Y));
-        quadVertices.Add(v3);
-        quadUvs.Add(new Vector2(v3.X, v3.Y));
-        quadVertices.Add(v4);
-        quadUvs.Add(new Vector2(v4.X, v4.Y));
-        quads.Add(vertexIndex);
-        quads.Add(vertexIndex + 2);
-        quads.Add(vertexIndex + 1);
-        quads.Add(vertexIndex + 1);
-        quads.Add(vertexIndex + 2);
-        quads.Add(vertexIndex + 3);
+        HexCell neighbour = cell.GetNeighbour(direction);
+        HexCell nextNeighbour = cell.GetNeighbour(direction.Next());
+
+        Color edgeColor = neighbour != null ? neighbour.defaultColourOne : cell.defaultColourOne;
+
+        if (neighbour == null)
+        {
+            return;
+        }
+
+        Vector3 bridge = HexMetrics.GetBridge(direction);
+        Vector3 v3 = v1 + bridge;
+        Vector3 v4 = v2 + bridge;
+
+        AddQuad(
+            v1, v2, v3, v4,
+            cell.defaultColourOne, edgeColor);
+
+        if (direction <= HexDirection.East && nextNeighbour != null)
+        {
+            SetTriangleVertices(
+                v2, v4, v2 + HexMetrics.GetBridge(direction.Next()),
+                cell.defaultColourOne, neighbour.defaultColourOne, nextNeighbour.defaultColourOne);
+        }
     }
 
     void AddQuad(
@@ -236,55 +210,36 @@ public partial class HexCell : Node3D
         Vector3 v3,
         Vector3 v4,
         Color c1,
-        Color c2,
-        Color c3,
-        Color c4
+        Color c2
     )
     {
-        int vertexIndex = quadVertices.Count;
+        surfaceTool2.SetSmoothGroup(UInt32.MaxValue);
+
+        // Triangle 1
         surfaceTool2.SetColor(c1);
+        surfaceTool2.SetUV(new Vector2(v1.X, v1.Y));
+        surfaceTool2.AddVertex(v1);
+
+        surfaceTool2.SetColor(c1);
+        surfaceTool2.SetUV(new Vector2(v2.X, v2.Y));
+        surfaceTool2.AddVertex(v2);
+
+        surfaceTool2.SetColor(c2);
+        surfaceTool2.SetUV(new Vector2(v4.X, v4.Y));
+        surfaceTool2.AddVertex(v4);
+
+        // Triangle 2
+        surfaceTool2.SetColor(c1);
+        surfaceTool2.SetUV(new Vector2(v1.X, v1.Y));
         surfaceTool2.AddVertex(v1);
 
         surfaceTool2.SetColor(c2);
-        surfaceTool2.AddVertex(v2);
-
-        surfaceTool2.SetColor(c3);
-        surfaceTool2.AddVertex(v3);
-
-        surfaceTool2.SetColor(c4);
+        surfaceTool2.SetUV(new Vector2(v4.X, v4.Y));
         surfaceTool2.AddVertex(v4);
 
-        quads.Add(vertexIndex);
-        quads.Add(vertexIndex + 2);
-        quads.Add(vertexIndex + 1);
-        quads.Add(vertexIndex + 1);
-        quads.Add(vertexIndex + 2);
-        quads.Add(vertexIndex + 3);
-    }
-
-    void AddQuadColour(Color c1, Color c2, Color c3, Color c4)
-    {
-        quadColours.Add(c1);
-        quadColours.Add(c2);
-        quadColours.Add(c3);
-        quadColours.Add(c4);
-    }
-
-    void ContinueTriangle(Vector3 v1, Vector3 v2)
-    {
-        int vertexIndex = hexVertices.Count;
-        hexVertices.Add(v1);
-        hexUvs.Add(new Vector2(v1.X, v1.Y));
-        hexVertices.Add(v2);
-        hexUvs.Add(new Vector2(v2.X, v2.Y));
-        triangles.Add(vertexIndex + 1);
-        triangles.Add(vertexIndex + 2);
-    }
-
-    void ContinueTriangleColor(Color colourOne)
-    {
-        hexColours.Add(colourOne);
-        hexColours.Add(colourOne);
+        surfaceTool2.SetColor(c2);
+        surfaceTool2.SetUV(new Vector2(v3.X, v3.Y));
+        surfaceTool2.AddVertex(v3);
     }
 
     void ClearMeshData()
@@ -293,14 +248,6 @@ public partial class HexCell : Node3D
         {
             hexMesh.ClearSurfaces();
             hexagon.ClearSurfaces();
-            hexVertices.Clear();
-            quadVertices.Clear();
-            hexUvs.Clear();
-            quadUvs.Clear();
-            triangles.Clear();
-            quads.Clear();
-            hexColours.Clear();
-            quadColours.Clear();
         }
     }
 }

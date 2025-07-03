@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CCommand.CCDatabase.Models
 {
-    internal class Player
+    [Table(nameof(Player))]
+    [PrimaryKey(nameof(PlayerId))]
+    public class Player
     {
+        [Key]
+        public Guid PlayerId { get; set; } = Guid.NewGuid();
+        public string PlayerName { get; set; }
+
+        [ForeignKey(nameof(PlayerState))]
+        public Guid PlayerStateId { get; set; }
     }
 }

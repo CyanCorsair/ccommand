@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCommand.CCDatabase.Models.StrategicLayer
 {
-    internal class Nation : Faction
+    public class Nation : Faction
     {
     }
 }

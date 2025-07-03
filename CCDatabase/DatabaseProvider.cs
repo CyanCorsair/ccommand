@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using CCommand.CCDatabase.Models;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace CCommand.CCDatabase
 {
